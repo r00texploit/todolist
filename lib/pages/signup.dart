@@ -131,8 +131,8 @@ class _SignUpPageState extends State<SignUpPage> {
         style:
             TextStyle(color: Colors.white, backgroundColor: Colors.transparent),
         controller: text.contains("E-mail")
-            ? Provider.of<AuthClass>(context).emailController
-            : Provider.of<AuthClass>(context).passwordController,
+            ? Provider.of<AuthClass>(context, listen: false).emailController
+            : Provider.of<AuthClass>(context, listen: false).passwordController,
         obscureText: obscureText,
         decoration: InputDecoration(
           label: Text(
@@ -249,7 +249,10 @@ class _SignUpPageState extends State<SignUpPage> {
       splashColor: Colors.transparent,
       onTap: () async {
         try {
-          Provider.of<AuthClass>(context).createUser();
+          await Provider.of<AuthClass>(context, listen: false).createUser();
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => SignInPage()),
+              (route) => false);
         } catch (e) {
           final snackbar = SnackBar(content: Text(e.toString()));
           ScaffoldMessenger.of(context).showSnackBar(snackbar);
@@ -259,7 +262,7 @@ class _SignUpPageState extends State<SignUpPage> {
         width: MediaQuery.of(context).size.width - 70,
         height: 60,
         child: Center(
-          child: circular
+          child: Provider.of<AuthClass>(context, listen: false).circular
               ? CircularProgressIndicator()
               : Text(
                   "Sign Up",

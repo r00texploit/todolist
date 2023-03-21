@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_todo/pages/addTodo.dart';
 import 'package:firebase_todo/pages/homepage.dart';
 import 'package:firebase_todo/pages/signup.dart';
@@ -42,8 +43,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void checkLogin() async {
-    String? token = await authClass.getToken();
-    log("message:${authClass.getToken()}");
+    String? token = await FirebaseAuth.instance.currentUser!.uid;
+    log("message:${token}");
     if (token != null) {
       setState(() {
         currentPage = HomePage();
