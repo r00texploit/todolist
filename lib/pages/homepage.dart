@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, sort_child_properties_last, prefer_const_literals_to_create_immutables, prefer_if_null_operators
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_todo/widget/todoCard.dart';
 import 'package:firebase_todo/pages/addTodo.dart';
 import 'package:firebase_todo/pages/signin.dart';
@@ -20,8 +21,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   AuthClass authClass = AuthClass();
-  final Stream<QuerySnapshot> _stream =
-      FirebaseFirestore.instance.collection("Todo").snapshots();
+  final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
+      .collection("Todo")
+      .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+      .snapshots();
 
   @override
   Widget build(BuildContext context) {

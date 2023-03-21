@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class TodoProvider with ChangeNotifier {
@@ -9,6 +10,7 @@ class TodoProvider with ChangeNotifier {
     FirebaseFirestore.instance.collection("Todo").add({
       'title': titleController.text,
       'description': descriptionController.text,
+      'user':FirebaseAuth.instance.currentUser!.uid,
       'type': type,
       'category': category // 42
     });
