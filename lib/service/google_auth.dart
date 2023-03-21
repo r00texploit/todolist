@@ -4,17 +4,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_todo/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class AuthClass {
+class AuthClass extends ChangeNotifier {
   GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [
       'email',
       'https://www.googleapis.com/auth/contacts.readonly',
     ],
   );
-  
+
   FirebaseAuth auth = FirebaseAuth.instance;
+  bool circular = false;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   
   final storage = new FlutterSecureStorage();
   Future<void> googleSignIn(BuildContext context) async {
@@ -31,6 +35,7 @@ class AuthClass {
           UserCredential userCredential =
               await auth.signInWithCredential(credential);
           storeTokenAndData(userCredential);
+          notifyListeners();
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (builder) => HomePage()),
@@ -122,5 +127,28 @@ class AuthClass {
     } catch (e) {
       showSnackbar(context, e.toString());
     }
+  }
+
+  createUser() async {
+    // setState(() {
+    circular = true;
+    notifyListeners();
+    // });
+    // try {
+      firebase_auth.UserCredential userCredential = await firebase_auth
+          .FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text);
+      print(userCredential.user!.email);
+      // setState(() {
+      circular = false;
+      // });
+    // } catch (e) {
+      
+      // setState(() {
+      circular = false;
+      notifyListeners();
+      // });
+    // }
   }
 }

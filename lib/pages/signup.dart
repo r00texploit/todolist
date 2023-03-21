@@ -7,6 +7,7 @@ import 'package:firebase_todo/service/google_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -41,11 +42,11 @@ class _SignUpPageState extends State<SignUpPage> {
                 SizedBox(
                   height: 70,
                 ),
-                textField("E-mail", _emailController, false),
+                textField("E-mail", false),
                 SizedBox(
                   height: 20,
                 ),
-                textField("Password", _passwordController, true),
+                textField("Password", true),
                 SizedBox(
                   height: 20,
                 ),
@@ -122,15 +123,16 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget textField(
-      String text, TextEditingController controller, bool obscureText) {
+  Widget textField(String text, bool obscureText) {
     return Container(
       width: MediaQuery.of(context).size.width - 70,
       height: 55,
       child: TextFormField(
         style:
             TextStyle(color: Colors.white, backgroundColor: Colors.transparent),
-        controller: controller,
+        controller: text.contains("E-mail")
+            ? Provider.of<AuthClass>(context).emailController
+            : Provider.of<AuthClass>(context).passwordController,
         obscureText: obscureText,
         decoration: InputDecoration(
           label: Text(
@@ -246,29 +248,11 @@ class _SignUpPageState extends State<SignUpPage> {
     return InkWell(
       splashColor: Colors.transparent,
       onTap: () async {
-        setState(() {
-          circular = true;
-        });
         try {
-          firebase_auth.UserCredential userCredential =
-              await firebaseAuth.createUserWithEmailAndPassword(
-                  email: _emailController.text,
-                  password: _passwordController.text);
-          print(userCredential.user!.email);
-          setState(() {
-            circular = false;
-          });
-          // ignore: use_build_context_synchronously
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (builder) => HomePage()),
-              (route) => false);
+          Provider.of<AuthClass>(context).createUser();
         } catch (e) {
           final snackbar = SnackBar(content: Text(e.toString()));
           ScaffoldMessenger.of(context).showSnackBar(snackbar);
-          setState(() {
-            circular = false;
-          });
         }
       },
       child: Container(

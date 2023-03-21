@@ -1,8 +1,12 @@
 // ignore_for_file: file_names, sized_box_for_whitespace, prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_todo/service/todo_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AddTodoPage extends StatefulWidget {
   const AddTodoPage({Key? key}) : super(key: key);
@@ -144,18 +148,22 @@ class _AddTodoPageState extends State<AddTodoPage> {
     ));
   }
 
-  Widget taskSelect(String label, int color) {
+  Widget taskSelect(String? label, int color) {
     return InkWell(
       onTap: () {
         setState(() {
-          type = label;
+          Provider.of<TodoProvider>(context, listen: false).type = label!;
+          // log("message:${}");
         });
       },
       child: Chip(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        backgroundColor: type == label ? Colors.white : Color(color),
+        backgroundColor:
+            Provider.of<TodoProvider>(context, listen: false).type == label
+                ? Colors.white
+                : Color(color),
         label: Text(
-          label,
+          label!,
           style: TextStyle(
               color: type == label ? Colors.black : Colors.white,
               fontSize: 13,
@@ -166,20 +174,26 @@ class _AddTodoPageState extends State<AddTodoPage> {
     );
   }
 
-  Widget categorySelect(String label, int color) {
+  Widget categorySelect(String? label, int color) {
     return InkWell(
       onTap: () {
         setState(() {
-          category = label;
+          Provider.of<TodoProvider>(context, listen: false).category = label!;
         });
       },
       child: Chip(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        backgroundColor: category == label ? Colors.black : Color(color),
+        backgroundColor:
+            Provider.of<TodoProvider>(context, listen: false).category == label
+                ? Colors.black
+                : Color(color),
         label: Text(
-          label,
+          label!,
           style: TextStyle(
-              color: type == label ? Colors.white : Colors.white,
+              color: Provider.of<TodoProvider>(context, listen: false).type ==
+                      label
+                  ? Colors.white
+                  : Colors.white,
               fontSize: 13,
               fontWeight: FontWeight.bold),
         ),
@@ -191,12 +205,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
   Widget createButton() {
     return InkWell(
       onTap: () {
-        FirebaseFirestore.instance.collection("Todo").add({
-          'title': _titleController.text,
-          'description': _descriptionController.text,
-          'type': type,
-          'category': category // 42
-        });
+        log("message:${Provider.of<TodoProvider>(context, listen: false).titleController.text}");
+        Provider.of<TodoProvider>(context, listen: false).addToDo();
         Navigator.pop(context);
       },
       child: Container(
@@ -231,7 +241,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
         borderRadius: BorderRadius.circular(15),
       ),
       child: TextFormField(
-        controller: _descriptionController,
+        controller: Provider.of<TodoProvider>(context, listen: false)
+            .descriptionController,
         maxLines: null,
         style: TextStyle(color: Colors.white, fontSize: 14),
         decoration: InputDecoration(
@@ -252,7 +263,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
         borderRadius: BorderRadius.circular(15),
       ),
       child: TextFormField(
-        controller: _titleController,
+        controller:
+            Provider.of<TodoProvider>(context, listen: false).titleController,
         style: TextStyle(color: Colors.white, fontSize: 14),
         decoration: InputDecoration(
             hintText: "Task Title",

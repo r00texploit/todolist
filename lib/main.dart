@@ -1,16 +1,27 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, sort_child_properties_last, unused_local_variable, annotate_overrides
 
+import 'dart:developer';
+
 import 'package:firebase_todo/pages/addTodo.dart';
 import 'package:firebase_todo/pages/homepage.dart';
 import 'package:firebase_todo/pages/signup.dart';
 import 'package:firebase_todo/service/google_auth.dart';
+import 'package:firebase_todo/service/todo_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => AuthClass()),
+      ChangeNotifierProvider(create: (_) => TodoProvider()),
+    ],
+    child: const MyApp(),
+  ));
+  // const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -32,6 +43,7 @@ class _MyAppState extends State<MyApp> {
 
   void checkLogin() async {
     String? token = await authClass.getToken();
+    log("message:${authClass.getToken()}");
     if (token != null) {
       setState(() {
         currentPage = HomePage();
@@ -42,7 +54,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     //Firebase.initializeApp();
     return MaterialApp(
-      home: HomePage(),
+      home: currentPage,
       debugShowCheckedModeBanner: false,
     );
   }
