@@ -10,7 +10,7 @@ class TodoProvider with ChangeNotifier {
     FirebaseFirestore.instance.collection("Todo").add({
       'title': titleController.text,
       'description': descriptionController.text,
-      'user':FirebaseAuth.instance.currentUser!.uid,
+      'user': FirebaseAuth.instance.currentUser!.uid,
       'type': type,
       'category': category // 42
     });
